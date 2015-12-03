@@ -36,7 +36,11 @@ public class Main extends Application {
     void drawAnts(GraphicsContext context) {
         context.clearRect(0, 0, WIDTH, HEIGHT);
         for (Ant ant : ants) {
-            context.setFill(Color.BLACK);
+            if (aggravateAnt(ant)) {
+                context.setFill(Color.RED);
+            } else {
+                context.setFill(Color.GREEN);
+            }
             context.fillOval(ant.x, ant.y, 5, 5);
         }
     }
@@ -60,6 +64,18 @@ public class Main extends Application {
         return ant;
     }
 
+    boolean aggravateAnt(Ant ant) {
+        for (Ant a : ants) {
+            if (a != ant) {
+                double distance = Math.sqrt(Math.pow((a.x - ant.x), 2) + Math.pow((a.y - ant.y), 2));
+                if (distance <= Math.abs(10)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     void updateAnts() {
         //changed stream to parallelstream below to utilize parallelism
         ants = ants.parallelStream()
@@ -73,9 +89,8 @@ public class Main extends Application {
         return (int) (1 / diffSeconds);
     }
 
-
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("main.fxml"));
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         Canvas canvas = (Canvas) scene.lookup("#canvas");
@@ -99,7 +114,6 @@ public class Main extends Application {
         };
         timer.start();
     }
-
 
     public static void main(String[] args) {
         launch(args);
